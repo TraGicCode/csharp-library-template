@@ -1,0 +1,1 @@
+gem 'modulesync', git: 'https://github.com/voxpupuli/modulesync'
