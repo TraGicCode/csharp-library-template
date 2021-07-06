@@ -24,7 +24,7 @@ build_script:
 - ps: dotnet build --no-restore --configuration Release
 - ps: dotnet pack --no-restore --no-build --configuration Release --include-source /p:Version=$env:APPVEYOR_BUILD_VERSION
 artifacts:
-  - path: <%= @metadata[:module_name] %>\<%= @metadata[:module_name] %>.Package\bin\Release\<%= @metadata[:module_name] %>.*.nupkg
+  - path: src\<%= @metadata[:module_name] %>\bin\Release\<%= @metadata[:module_name] %>.*.nupkg
     name: nupkgs
 deploy:
   - provider: NuGet
