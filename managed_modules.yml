@@ -1,2 +1,3 @@
 ---
 - NServiceBus.CustomChecks.SqlServer
+- NServiceBus.CustomChecks.ElasticSearch
