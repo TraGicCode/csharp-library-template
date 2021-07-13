@@ -1,3 +1,8 @@
 ---
+:global:
+  library_type:
+    NServiceBus.CustomChecks.SqlServer:        [nservicebus-custom-check]
+    NServiceBus.CustomChecks.ElasticSearch:    [nservicebus-custom-check]
+
 appveyor.yml:
   image: 'Visual Studio 2019'

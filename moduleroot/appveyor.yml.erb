@@ -18,11 +18,23 @@ dotnet_csproj:
   assembly_version: '{version}'
   file_version: '{version}'
   informational_version: '{version}'
+<%
+is_nservicebus_custom_check = (
+  @configs['library_type'].is_a?(Hash) \
+  && @configs['library_type'][@configs[:puppet_module]].is_a?(Array) \
+  && @configs['library_type'][@configs[:puppet_module]].include?('nservicebus-custom-check')
+)
+if is_nservicebus_custom_check -%>
 before_build:
   - ps: dotnet restore
 build_script: 
-- ps: dotnet build --no-restore --configuration Release
-- ps: dotnet pack --no-restore --no-build --configuration Release --include-source /p:Version=$env:APPVEYOR_BUILD_VERSION
+  - ps: msbuild /property:Configuration=Release /p:Version=$env:APPVEYOR_BUILD_VERSION
+<% else -%>
+Before_build:
+  - ps: dotnet restore
+build_script: 
+  - ps: dotnet build A TEST
+<% end -%>
 artifacts:
   - path: src\<%= @metadata[:module_name] %>\bin\Release\<%= @metadata[:module_name] %>.*.nupkg
     name: nupkgs
