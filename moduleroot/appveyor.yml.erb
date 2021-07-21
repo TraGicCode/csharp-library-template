@@ -20,9 +20,8 @@ dotnet_csproj:
   informational_version: '{version}'
 <%
 is_nservicebus_custom_check = (
-  @configs['library_type'].is_a?(Hash) \
-  && @configs['library_type'][@configs[:puppet_module]].is_a?(Array) \
-  && @configs['library_type'][@configs[:puppet_module]].include?('nservicebus-custom-check')
+  @configs[@metadata[:module_name]].is_a?(Hash) \
+  && @configs[@metadata[:module_name]]['library_type'] == 'nservicebus-custom-check'
 )
 if is_nservicebus_custom_check -%>
 before_build:

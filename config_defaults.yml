@@ -1,9 +1,54 @@
 ---
 :global:
-  library_type:
-    NServiceBus.CustomChecks.SqlServer:        [nservicebus-custom-check]
-    NServiceBus.CustomChecks.ElasticSearch:    [nservicebus-custom-check]
-    NServiceBus.CustomChecks.Http:             [nservicebus-custom-check]
+    NServiceBus.CustomChecks.SqlServer:
+      library_type: nservicebus-custom-check
+      description_suffix: Sql Server
+      usage_code_block: |-
+        namespace Ordering.Endpoint.CustomChecks
+        {
+            public class OrderingSqlServerCustomCheck : SqlServerCustomCheck
+            {
+                private const string ConnectionString =
+                    "Data Source=(local);Initial Catalog=Ordering;Integrated Security=True";
+
+                public OrderingSqlServerCustomCheck() : base(ConnectionString, TimeSpan.FromSeconds(10))
+                {
+                }
+            }
+        }
+    NServiceBus.CustomChecks.ElasticSearch:
+      library_type: nservicebus-custom-check
+      description_suffix: Elastic Search
+      usage_code_block: |-
+        namespace Ordering.Endpoint.CustomChecks
+        {
+            public class OrderingElasticSearchCustomCheck : ElasticSearchCustomCheck
+            {
+                private static TimeSpan repeat = TimeSpan.FromSeconds(5);
+                private static Uri elasticSearchUri = new Uri("http://localhost:9200");
+                public OrderingElasticSearchCustomCheck(): base(elasticSearchUri, repeat)
+                {
+
+                }
+            }
+        }
+    NServiceBus.CustomChecks.Http:
+      library_type: nservicebus-custom-check
+      description_suffix: Http Endpoints
+      usage_code_block: |-
+        namespace Ordering.Endpoint.CustomChecks
+        {
+            public class GitHubHttpApiCustomCheck : HttpCustomCheck
+            {
+                private static TimeSpan repeat = TimeSpan.FromSeconds(5);
+                private static string httpUrl = "https://api.github.com";
+                
+                public GitHubHttpApiCustomCheck(): base(url: httpUrl, id: $"Monitor {httpUrl}", "Third Party Dependency", repeat)
+                {
+        
+                }
+            }
+        }
 
 appveyor.yml:
   image: 'Visual Studio 2019'
