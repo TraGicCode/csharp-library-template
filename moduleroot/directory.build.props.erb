@@ -1,0 +1,5 @@
+<Project>
+    <PropertyGroup>
+        <PackageTags><%= (@configs[@configs[@metadata[:module_name]]['library_type']]['nuget-package-tags'] +  (@configs['nuget-package-tags-extras'] || [])).join(';') %></PackageTags>
+    </PropertyGroup>
+</Project>

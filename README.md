@@ -223,3 +223,14 @@ config_defaults.yml
     - env: PUPPET_GEM_VERSION="~> 4.0" CHECK=parallel_spec
       rvm: 2.1.9
 ```
+
+
+# Add extra stuff to an array
+
+<%- (((@configs['matrix']) + (@configs['matrix_extras'] || [])) - (@configs['remove_includes'] || [])).each do |matrix| -%>
+
+# Defining information in a module but there is no sane default i can put in config_defaults.yml
+
+<%- (@configs['environment'] || []).each do |key, value| -%>
+  <%= key %>: <%= value %>
+<%- end -%>
