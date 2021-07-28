@@ -16,6 +16,20 @@ msync --help
 ```
 
 
+# Workflow for adding .sync.yml and/or adding values to it
+
+1. Get the projects to get cloned and sync to run
+  - msync update --noop
+1. Add and/or update .sync.yml with new changes
+1. Run msync offline to prevent loosing changes
+  - msync update --offline
+1. verify results
+1. Loop through each module and make a commit to the modulesync branch ( which msync is already switched to ) to indicate you updated/added the file manually
+1. Now run msync to push the branch and changes and create the pr 
+  - msync update --pr
+
+
+
 
 ## Important Notes
 
