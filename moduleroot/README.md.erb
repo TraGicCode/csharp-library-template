@@ -10,18 +10,18 @@
 1. [Description](#description)
 1. [How to use it](#how-to-use-it)
 1. [How it works](#how-it-works)
-1. [Development - Guide for contributing to the module](#contributing)
+1. [Development - Guide for contributing](#contributing)
 
 ## Description
 
-A Reusable NServiceBus CustomCheck to check the availability and connectivity of <%= @configs[@metadata[:module_name]]['description_suffix'] %>.
+A Reusable NServiceBus CustomCheck to check the availability and connectivity of <%= @configs['description_suffix'] %>.
 
 ## How to use it
 
 In order to begin using this custom check simply create a child class for each instance you would like to perform a healthcheck on.
 
 ```c#
-<%= @configs[@metadata[:module_name]]['usage_code_block'] %>
+<%= @configs['usage_code_block'] %>
 ```
 
 ## Contributing

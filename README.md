@@ -24,9 +24,10 @@ msync --help
 1. Run msync offline to prevent loosing changes
   - msync update --offline
 1. verify results
-1. Loop through each module and make a commit to the modulesync branch ( which msync is already switched to ) to indicate you updated/added the file manually
-1. Now run msync to push the branch and changes and create the pr 
-  - msync update --pr
+1. run ./scripts/commit-and-push-sync-file-changes.ps1
+  a. Loop through each module and make a commit to the modulesync branch ( which msync is already switched to ) to indicate you updated/added the file manually
+  b. Now run msync to push the branch and changes and create the pr 
+    - msync update --pr
 
 
 
@@ -248,3 +249,9 @@ config_defaults.yml
 <%- (@configs['environment'] || []).each do |key, value| -%>
   <%= key %>: <%= value %>
 <%- end -%>
+
+
+# Configuration that is has no default, but is optional and is defined in the modules .sync.yml
+
+https://github.com/puppetlabs/pdk-templates/blob/main/moduleroot/spec/default_facts.yml.erb
+Shows how to have something optional that has no sane default in default_config.yml
