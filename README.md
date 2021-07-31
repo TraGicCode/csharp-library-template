@@ -255,3 +255,18 @@ config_defaults.yml
 
 https://github.com/puppetlabs/pdk-templates/blob/main/moduleroot/spec/default_facts.yml.erb
 Shows how to have something optional that has no sane default in default_config.yml
+
+
+# Add helper function as top of function
+
+<%
+def requires(item)
+  if item.is_a? String
+    line = "require '#{item}'"
+  elsif item.is_a? Hash
+    line = "require '#{item['require']}'" unless item['require'].nil?
+    line = "#{line} if #{item['conditional']}" unless item['require'].nil? and item['conditional'].nil?
+  end
+  line
+end
+-%>

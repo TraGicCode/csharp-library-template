@@ -1,5 +1,16 @@
 <Project>
+
+    <!-- Nuget Package Info -->
     <PropertyGroup>
+        <Title><%= @metadata[:module_name] %></Title>
+        <PackageProjectUrl>https://github.com/TraGicCode/<%= @metadata[:module_name] %></PackageProjectUrl>
+        <RepositoryUrl>https://github.com/TraGicCode/<%= @metadata[:module_name] %></RepositoryUrl>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageTags><%= (@configs[@configs[@metadata[:module_name]]['library_type']]['nuget-package-tags'] +  (@configs['nuget-package-tags-extras'] || [])).join(';') %></PackageTags>
+        <%- if @configs[@metadata[:module_name]]['library_type'] == 'nservicebus-custom-check' -%>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies> <!-- Ensure nuget dependencies make it to bin directory for il-repack -->
+        <%- end -%>
     </PropertyGroup>
+
 </Project>

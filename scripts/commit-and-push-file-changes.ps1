@@ -5,7 +5,7 @@ $repositories = Get-ChildItem -Path .\modules\*\*
 ForEach($repository in $repositories)
 {
     cd $repository
-    git add .sync.yml
+    git add -A
     git commit -m "Added/Updated .sync.yml outside of msync"
 }
 
