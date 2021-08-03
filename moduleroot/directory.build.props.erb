@@ -30,4 +30,11 @@
         <%- end -%>
     </PropertyGroup>
 
+    <%- if @configs[@metadata[:module_name]]['library_type'] == 'nservicebus-custom-check' -%>
+    <!-- ILRepack Target -->
+    <PropertyGroup>
+        <ILRepackTargetsFile>$(SolutionDir)ILRepack.targets</ILRepackTargetsFile>
+    </PropertyGroup>
+    <%- end -%>
+
 </Project>

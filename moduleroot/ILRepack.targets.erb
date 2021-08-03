@@ -1,0 +1,21 @@
+<%- if @configs[@metadata[:module_name]]['library_type'] == 'nservicebus-custom-check' -%>
+<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Target Name="ILRepacker" AfterTargets="Build" Condition="'$(Configuration)' == 'Release' And '$(MSBuildProjectName)' == '<%= @metadata[:module_name] %>'">
+        
+        <ItemGroup>
+            <InputAssemblies Include="$(OutputPath)\<%= @metadata[:module_name] %>.dll" />
+            <InputAssemblies Include="$(OutputPath)\*.dll" Exclude="$(OutputPath)\NServiceBus.*.dll" />
+        </ItemGroup>
+
+        <ILRepack
+            Parallel="true"
+            Internalize="true"
+            RenameInternalized="true"
+            InputAssemblies="@(InputAssemblies)"
+            OutputFile="$(OutputPath)\$(AssemblyName).dll"
+            Verbose="true"
+        />
+    </Target>
+</Project> 
+<%- end -%>
