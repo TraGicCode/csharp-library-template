@@ -270,3 +270,60 @@ def requires(item)
   line
 end
 -%>
+
+
+File.open("out.txt", "w+") { |file| file.write("boo!") }
+
+# Add content based on if certain directories/files exist in the repository
+
+```
+<%- if Dir[File.join(@metadata[:workdir], 'spec', 'acceptance', '**', '*_spec.rb')].any? -%>
+
+  acceptance:
+    needs: setup_matrix
+    runs-on: ubuntu-latest
+    env:
+      BUNDLE_WITHOUT: development:test:release
+    strategy:
+      fail-fast: false
+      matrix:
+        setfile: ${{fromJson(needs.setup_matrix.outputs.beaker_setfiles)}}
+        puppet: ${{fromJson(needs.setup_matrix.outputs.puppet_major_versions)}}
+        <%- @configs['beaker_fact_matrix'].each do |option, values| -%>
+        <%= option %>:
+        <%- values.each do |value| -%>
+          - "<%= value %>"
+        <%- end -%>
+        <%- end -%>
+        <%- if @configs['excludes'].any? -%>
+        exclude:
+        <%- @configs['excludes'].each do |exclude| -%>
+        <%- exclude.each do |key, value| -%>
+          <%= key == exclude.first.first ? '-' : ' ' %> <%= key %>: "<%= value %>"
+        <%- end -%>
+        <%- end -%>
+        <%- end -%>
+    <%-
+      name = ['${{ matrix.puppet.name }}', '${{ matrix.setfile.name }}']
+      @configs['beaker_fact_matrix'].each_key do |option|
+        name << "#{option.tr('_', ' ').capitalize} ${{ matrix.#{option} }}"
+      end
+    -%>
+    name: <%= name.join(' - ') %>
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+          bundler-cache: true
+      - name: Run tests
+        run: bundle exec rake beaker
+        env:
+          BEAKER_PUPPET_COLLECTION: ${{ matrix.puppet.collection }}
+          BEAKER_setfile: ${{ matrix.setfile.value }}
+          <%- @configs['beaker_fact_matrix'].keys.each do |fact| -%>
+          BEAKER_FACTER_<%= fact.upcase %>: ${{ matrix.<%= fact %> }}
+          <%- end -%>
+<%- end -%>
+```
