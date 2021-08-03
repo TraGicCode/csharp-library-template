@@ -1,3 +1,20 @@
+<%
+# Create a new file and write to it
+# File.open( @metadata[:workdir] + "/out.txt", "w+") { |file| file.write("boo!") }
+
+# Create a new file with dynamic name and render the erb template inside
+# Example:
+# ./src/@metadata[:module_name] /@metadata[:module_name].csproj
+# require 'erb'
+
+# module_sync_config_root = @metadata[:workdir] + "../../../.."
+# dynamic_file_templates_root = module_sync_config_root + "/filetemplates"
+
+# rendered_template = ERB.new(File.read(dynamic_file_templates_root + "/module.csproj.erb"), eoutvar: '_sub01').result(binding)
+# # puts rendered_template
+# File.open(@metadata[:workdir] + "/src/" + @metadata[:module_name] + "/" + @metadata[:module_name] + ".csproj", "w+") { |file| file.write(rendered_template) }
+
+-%>
 <Project>
 
     <!-- Nuget Package Info -->
