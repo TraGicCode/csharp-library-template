@@ -24,15 +24,13 @@
         <RepositoryUrl>https://github.com/TraGicCode/<%= @metadata[:module_name] %></RepositoryUrl>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageTags><%= (@configs[@configs[@metadata[:module_name]]['library_type']]['nuget-package-tags'] +  (@configs['nuget-package-tags-extras'] || [])).join(';') %></PackageTags>
-        <%- if @configs[@metadata[:module_name]]['library_type'] == 'nservicebus-custom-check' -%>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies> <!-- Ensure nuget dependencies make it to bin directory for il-repack -->
-        <%- end -%>
     </PropertyGroup>
 
     <%- if @configs[@metadata[:module_name]]['library_type'] == 'nservicebus-custom-check' -%>
-    <!-- ILRepack Target -->
-    <PropertyGroup>
+    <!-- ILRepack Info -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Release' And '$(MSBuildProjectName)' == '<%= @metadata[:module_name] %>'">
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies> <!-- Ensure nuget dependencies make it to bin directory for il-repack -->
         <ILRepackTargetsFile>$(SolutionDir)ILRepack.targets</ILRepackTargetsFile>
     </PropertyGroup>
     <%- end -%>
