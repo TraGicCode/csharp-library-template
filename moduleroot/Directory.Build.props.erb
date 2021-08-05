@@ -1,0 +1,38 @@
+<%
+# Create a new file and write to it
+# File.open( @metadata[:workdir] + "/out.txt", "w+") { |file| file.write("boo!") }
+
+# Create a new file with dynamic name and render the erb template inside
+# Example:
+# ./src/@metadata[:module_name] /@metadata[:module_name].csproj
+# require 'erb'
+
+# module_sync_config_root = @metadata[:workdir] + "../../../.."
+# dynamic_file_templates_root = module_sync_config_root + "/filetemplates"
+
+# rendered_template = ERB.new(File.read(dynamic_file_templates_root + "/module.csproj.erb"), eoutvar: '_sub01').result(binding)
+# # puts rendered_template
+# File.open(@metadata[:workdir] + "/src/" + @metadata[:module_name] + "/" + @metadata[:module_name] + ".csproj", "w+") { |file| file.write(rendered_template) }
+
+-%>
+<Project>
+
+    <!-- Nuget Package Info -->
+    <PropertyGroup>
+        <Title><%= @metadata[:module_name] %></Title>
+        <PackageProjectUrl>https://github.com/TraGicCode/<%= @metadata[:module_name] %></PackageProjectUrl>
+        <RepositoryUrl>https://github.com/TraGicCode/<%= @metadata[:module_name] %></RepositoryUrl>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <PackageTags><%= (@configs[@configs[@metadata[:module_name]]['library_type']]['nuget-package-tags'] +  (@configs['nuget-package-tags-extras'] || [])).join(';') %></PackageTags>
+    </PropertyGroup>
+
+    <%- if @configs[@metadata[:module_name]]['library_type'] == 'nservicebus-custom-check' -%>
+    <!-- ILRepack Info -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Release' And '$(MSBuildProjectName)' == '<%= @metadata[:module_name] %>'">
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies> <!-- Ensure nuget dependencies make it to bin directory for il-repack -->
+        <ILRepackTargetsFile>$(SolutionDir)ILRepack.targets</ILRepackTargetsFile>
+    </PropertyGroup>
+    <%- end -%>
+
+</Project>

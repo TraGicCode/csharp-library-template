@@ -10,7 +10,7 @@
 appveyor.yml:
   image: 'Visual Studio 2019'
 
-directory.build.props:
+Directory.Build.props:
   nservicebus-custom-check:
     nuget-package-tags:
       - nservicebus
