@@ -120,10 +120,11 @@ Guardfile
 
 Here is another example of where there is no sane default that can be applied but the code is written in a way that it wont blow up
 
+```
 <%- (@configs['environment'] || []).each do |key, value| -%>
   <%= key %>: <%= value %>
 <%- end -%>
-
+```
 
 
 # Configuration that is has no default, but is optional and is defined in the modules .sync.yml
@@ -135,7 +136,9 @@ Shows how to have something optional that has no sane default in default_config.
 
 Below shows an example on how to utilize defaults, add .sync.yml extras, AND exclude certain defaults is the module needs to.
 
+```
 <%- (((@configs['matrix']) + (@configs['matrix_extras'] || [])) - (@configs['remove_includes'] || [])).each do |matrix| -%>
+```
 
 ## Combining default configurations + .sync.yml configurations
 
