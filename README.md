@@ -1,10 +1,10 @@
 # Summary
 
-These Templates used for building and release csharp roslyn analyzers.
+Templates to help provide consistency and reduce overhead required for creating and maintaining my open-source csharp projects.
 
-# Installing modulesync
+## Installing modulesync
 
-## windows
+### windows
 
 ```
 choco install ruby -y
@@ -14,6 +14,21 @@ ridk install 2 3
 gem install modulesync
 msync --help
 ```
+
+# Creating a new github repository
+
+1. Navigate to the directory in which you want the git repo to be cloned into
+1. Create github repository with basic readme ( NOTE: at least 1 file must exist within the github repository )
+
+```
+> cd C:\Source\tragiccode\
+> gh repo create NServiceBus.CustomChecks.SqlServer --gitignore VisualStudio --public -y
+> cd C:\Source\tragiccode\csharp-library-template
+```
+1. Update `managed_modules.yml` with the name of the new gitub repository
+1. Update the :global: section of the `config_defaults.yml` to contain the new github repository and appropriate library_type ( as of now only nservicebus-custom-check exists )
+1. The first time you run modulesync you will probably want to add a .sync.yml to provide customizations/additions specific to the new github repository (Ex: nuget package tags ).  Follow the workflow
+   below for adding a .sync.yml and changing/adding values to it.
 
 
 # Workflow for adding .sync.yml and/or adding values to it
@@ -29,37 +44,16 @@ msync --help
   b. Now run msync to push the branch and changes and create the pr 
     - msync update --pr
 
-
-
-
-## Important Notes
-
-- Templates MUST have a .erb extension. 
-- Static files ( that are not templates ) also must have a .erb extension or they wont get moved to your target github repos.
-- Default configuration values for files live in `config_defaults.yml`
-- To Override or extend values in `config_defaults.yml` simply add a `.sync.yml` at the root of your module repo
-    - To override simply use the same config but ovewrite the value
-    - to extend you could, for example, have a set of "required" gems that are added to all Gemfiles, and a set of "optional" gems that a single module might add.
-    - you can also add more complicated ruby that like ensures arrays from both files are unique when it combines them or alows you to exclude certain items from the      config_defaults.yml array.
-- I think Arrays and hashes get merged together
-    - if a key conflicts it's overwritten
-    - single vlaues overwrite as well
-    - hashes with different keys get merged
-    - arrays get merged
-- Values are accessed with the @configs hash
-- `:globals` allows you to define defaults that are accessed from every file ( Maybe something like library_type )
-
-
-Documentation from puppetlabs on how to use modulesync
-https://github.com/puppetlabs/modulesync_configs
-
 ## Example Use Cases
 
-Puppet's pdk-templates utilizes modulesync under the covers ( or something similiar ) and therefore provides some pretty good examples on strategies for handling certain situations.  Below are the documentated tricks that i've seen out in the wild.
-
-NOTE: Remember, this can be applied globally by adding it to config_default.yml or if you only want it to apply to a specific module add is to that modules .sync.yml
 
 ## Prevent msync from trying to change/update a file
+
+Sometimes you might not want msync to manage a file or set of files at all.  In this case, you can simply inform msync the file should be `unmanaged`
+
+Common Examples of when you would do this:
+- If you have a file that has to many deviations from the current templates and you would like to no longer manage it simply add the following to the repo's .sync.yml.
+- If you want to utilize msync for initial creationg of github files but after the initial sync never change and be allowed to deviate to reduce github repo setup overhead
 
 .sync.yml
 ```
@@ -71,6 +65,8 @@ appveyor.yml:
 
 ## Remove/Delete a file that isn't applicable
 
+If a file is not applicable for your library then you can update the .sync.yml to ensure the file will be deleted and not be commited as part of the repository.
+
 .sync.yml
 ```
 ---
@@ -79,6 +75,8 @@ appveyor.yml
 ```
 
 ## Adding module specific items to .gitignore
+
+Sometimes you want to provide a customization point for modules to apply any "extra" stuff they might need to a file.  The below is a great example of how to do this.
 
 .sync.yml
 ```
@@ -120,8 +118,29 @@ Guardfile
 <% end -%>
 ```
 
+Here is another example of where there is no sane default that can be applied but the code is written in a way that it wont blow up
 
-## Adding to an array of items
+<%- (@configs['environment'] || []).each do |key, value| -%>
+  <%= key %>: <%= value %>
+<%- end -%>
+
+
+
+# Configuration that is has no default, but is optional and is defined in the modules .sync.yml
+
+https://github.com/puppetlabs/pdk-templates/blob/main/moduleroot/spec/default_facts.yml.erb
+Shows how to have something optional that has no sane default in default_config.yml
+
+## Explicitly excluding certain defaults
+
+Below shows an example on how to utilize defaults, add .sync.yml extras, AND exclude certain defaults is the module needs to.
+
+<%- (((@configs['matrix']) + (@configs['matrix_extras'] || [])) - (@configs['remove_includes'] || [])).each do |matrix| -%>
+
+## Combining default configurations + .sync.yml configurations
+
+Sometimes you want to have some defaults that might change in the future along with customizations from a module.  Below is an example on how to merge the configurations together
+
 
 .sync.yml
 ```
@@ -157,6 +176,8 @@ Gemfile:
       - gem: voxpupuli-release
       - gem: puppet-strings
         version: '>= 2.2'
+```
+
 ```
 source ENV['GEM_SOURCE'] || "https://rubygems.org"
 
@@ -197,7 +218,9 @@ gem 'puppet', puppetversion, :require => false, :groups => [:test]
 ```
 
 
-## Adding a here doc
+## Adding a here doc string
+
+Below shows an example of adding a multi-line string to a template using here doc style strings
 
 ```
 Gemfile:
@@ -218,47 +241,10 @@ spec/spec_helper.rb:
     end
 ```
 
-# Appending to an array
-
-config_defaults.yml
-```
-.travis.yml:
-    includes:
-        - env: CHECK="validate lint check rubocop"
-        stage: static
-        - env: PUPPET_GEM_VERSION="~> 6.0" CHECK=parallel_spec
-        rvm: 2.5.7
-        stage: spec
-```
-
-.sync.yml
-```
-.travis.yml:
-  includes:
-    - env: PUPPET_GEM_VERSION="~> 4.0" CHECK=parallel_spec
-      rvm: 2.1.9
-```
-
-
-# Add extra stuff to an array
-
-<%- (((@configs['matrix']) + (@configs['matrix_extras'] || [])) - (@configs['remove_includes'] || [])).each do |matrix| -%>
-
-# Defining information in a module but there is no sane default i can put in config_defaults.yml
-
-<%- (@configs['environment'] || []).each do |key, value| -%>
-  <%= key %>: <%= value %>
-<%- end -%>
-
-
-# Configuration that is has no default, but is optional and is defined in the modules .sync.yml
-
-https://github.com/puppetlabs/pdk-templates/blob/main/moduleroot/spec/default_facts.yml.erb
-Shows how to have something optional that has no sane default in default_config.yml
-
-
 # Add helper function as top of function
 
+To help keep the template clean, you can create a helper function at the top of t he file like so. 
+```
 <%
 def requires(item)
   if item.is_a? String
@@ -270,9 +256,11 @@ def requires(item)
   line
 end
 -%>
+```
 
 
-File.open("out.txt", "w+") { |file| file.write("boo!") }
+TODO: Investigate extracting this to a file and being able to `require` it into the template that needs to use it
+
 
 # Add content based on if certain directories/files exist in the repository
 
@@ -327,3 +315,26 @@ File.open("out.txt", "w+") { |file| file.write("boo!") }
           <%- end -%>
 <%- end -%>
 ```
+
+
+## Important Notes
+
+- Templates MUST have a .erb extension. 
+- Static files ( that are not templates ) also must have a .erb extension or they wont get moved to your target github repos.
+- Default configuration values for files live in `config_defaults.yml`
+- To Override or extend values in `config_defaults.yml` simply add a `.sync.yml` at the root of your module repo
+    - To override simply use the same config but ovewrite the value
+    - to extend you could, for example, have a set of "required" gems that are added to all Gemfiles, and a set of "optional" gems that a single module might add.
+    - you can also add more complicated ruby that like ensures arrays from both files are unique when it combines them or alows you to exclude certain items from the      config_defaults.yml array.
+- I think Arrays and hashes get merged together
+    - if a key conflicts it's overwritten
+    - single vlaues overwrite as well
+    - hashes with different keys get merged
+    - arrays get merged
+- Values are accessed with the @configs hash
+- `:globals` allows you to define defaults that are accessed from every file ( Maybe something like library_type )
+
+
+Documentation from puppetlabs on how to use modulesync
+https://github.com/puppetlabs/modulesync_configs
+
