@@ -3,3 +3,5 @@
   namespace: TraGicCode
   branch: modulesync
   message: "Update from tragiccode/charp-library-template"
+  pr_labels:
+    - maintenance
