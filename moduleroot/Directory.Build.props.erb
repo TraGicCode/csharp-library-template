@@ -13,7 +13,8 @@ File.open(@metadata[:workdir] + "/src/" + @metadata[:module_name] + "/" + "Direc
 
     <!-- Nuget Package Info -->
     <PropertyGroup>
-        <Title><%= @metadata[:module_name] %></Title>
+        <PackageId><%= @metadata[:module_name] %></PackageId>
+        <Authors>TraGicCode</Authors>
         <PackageProjectUrl>https://github.com/TraGicCode/<%= @metadata[:module_name] %></PackageProjectUrl>
         <RepositoryUrl>https://github.com/TraGicCode/<%= @metadata[:module_name] %></RepositoryUrl>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
