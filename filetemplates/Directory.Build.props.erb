@@ -1,4 +1,10 @@
-<Project>    
+<Project>
+    <PropertyGroup>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
 <% if @configs[@metadata[:module_name]]['library_type'] == 'nservicebus-custom-check' %>
     <!-- ILRepack Info -->
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
