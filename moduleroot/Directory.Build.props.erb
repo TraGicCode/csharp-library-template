@@ -19,6 +19,16 @@ File.open(@metadata[:workdir] + "/src/" + @metadata[:module_name] + "/" + "Direc
         <RepositoryUrl>https://github.com/TraGicCode/<%= @metadata[:module_name] %></RepositoryUrl>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageTags><%= (@configs[@configs[@metadata[:module_name]]['library_type']]['nuget-package-tags'] +  (@configs['nuget-package-tags-extras'] || [])).join(';') %></PackageTags>
+        <!-- SourceLink -->
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
+
+    <!-- SourceLink -->
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    </ItemGroup>
 
 </Project>

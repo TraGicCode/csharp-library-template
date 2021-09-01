@@ -35,7 +35,7 @@ build_script:
   - ps: dotnet build A TEST
 <% end -%>
 artifacts:
-  - path: src\<%= @metadata[:module_name] %>\bin\Release\<%= @metadata[:module_name] %>.*.nupkg
+  - path: src\<%= @metadata[:module_name] %>\bin\Release\<%= @metadata[:module_name] %>.*nupkg
     name: nupkgs
 deploy:
   - provider: NuGet
