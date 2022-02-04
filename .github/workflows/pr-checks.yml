@@ -27,4 +27,5 @@ jobs:
       - name: Run msync update
         if: ${{ github.repository_owner == 'TraGicCode' }}
         run: |
+          gem install modulesync
           msync update --pr --amend --force
