@@ -14,7 +14,34 @@ jobs:
           ref: ${{ github.head_ref }} # needed for 'codacy/git-version'
           fetch-depth: 0 # needed for 'codacy/git-version'
 
-      - name: Set up Ruby 2.7
-        uses: actions/setup-ruby@v1
+      - name: Generate Version Number
+        uses: codacy/git-version@2.2.0
+        id: gitversion
+
+    outputs:
+      version: ${{ steps.gitversion.outputs.version  }}
+  build:
+    needs: [ get-version ]
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        dotnet-version: ['3.1.x', '5.0.x', '6.0.x']
+
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup .NET Core SDK  ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v1
         with:
-          ruby-version: 2.7
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Restore Nuget Packages
+        run: dotnet restore
+
+      # Build
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Run MSBuild
+        run: msbuild /property:Configuration=Release /p:Version=${{ needs.get-version.outputs.version }}

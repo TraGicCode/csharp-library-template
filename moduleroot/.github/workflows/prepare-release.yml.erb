@@ -19,7 +19,7 @@ jobs:
       # Cool changelog https://github.com/liqotech/liqo/blob/529c90a589869f5606507bf9390913fc62afc5d6/.github/workflows/integration.yml
       - name: "Update Release CHANGELOG"
         id: update-release-changelog
-        uses: heinrichreimer/github-changelog-generator-action@v2.2
+        uses: heinrichreimer/github-changelog-generator-action@v2.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           excludeLabels: 'maintenance'
