@@ -43,3 +43,4 @@ jobs:
           gem install modulesync
           msync update --noop
           & ./scripts/commit-and-push-file-changes.ps1
+          msync update --pr --amend --force
