@@ -49,3 +49,4 @@ jobs:
           gem install modulesync
           msync update --noop
           & ./scripts/commit-and-push-file-changes.ps1
+          msync update --pr --amend --git_base "https://${{ secrets.GITHUB_TOKEN }}@github.com/" --force 
