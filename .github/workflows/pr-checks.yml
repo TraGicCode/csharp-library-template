@@ -1,0 +1,41 @@
+name: Run ModuleSync
+
+on: [pull_request]
+
+jobs:
+  get-version:
+    # Environment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v2
+
+      # Configure git user and email
+      - name: "Configure git user and email"
+        if: ${{ github.repository_owner == 'TraGicCode' }} # investigate this for security concerns and learning
+        run: |
+          git config --global user.email "${{ github.repository_owner }}@users.noreply.github.com"
+          git config --global user.name "TraGicCode"
+
+      - name: Install Ruby 3.0
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+
+      - name: Setup SSH for modulesync
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+            ssh-private-key: ${{ secrets.MODULESYNC_SHH_PRIVATE_KEY }}
+
+      - name: Run ModuleSync update
+        if: ${{ github.repository_owner == 'TraGicCode' }}
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.MODULESYNC_GITHUB_TOKEN }}
+        run: |
+          gem install modulesync
+          msync update --noop
+          & ./scripts/commit-and-push-file-changes.ps1
+
+      
