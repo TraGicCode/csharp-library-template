@@ -11,3 +11,4 @@ ForEach($repository in $repositories)
 
 # Move back to root of repo
 Pop-Location
+msync update --pr --amend --force

@@ -1,4 +1,5 @@
 ---
+  git_base: 'https://github.com/'
   namespace: TraGicCode
   branch: modulesync
   message: "Update from tragiccode/charp-library-template"
