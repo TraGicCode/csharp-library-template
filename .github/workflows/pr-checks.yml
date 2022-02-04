@@ -1,9 +1,6 @@
-name: Pull Request Checks
+name: Run ModuleSync
 
 on: [pull_request]
-
-env:
-  GITHUB_TOKEN: ${{ secrets.MODULESYNC_GITHUB_TOKEN }}
 
 jobs:
   get-version:
@@ -18,8 +15,6 @@ jobs:
       - name: "Configure git user and email"
         if: ${{ github.repository_owner == 'TraGicCode' }} # investigate this for security concerns and learning
         run: |
-          git config --local user.email "${{ github.repository_owner }}@users.noreply.github.com"
-          git config --local user.name "TraGicCode"
           git config --global user.email "${{ github.repository_owner }}@users.noreply.github.com"
           git config --global user.name "TraGicCode"
 
@@ -28,36 +23,12 @@ jobs:
         with:
           ruby-version: '3.0'
 
-      # - name: Run msync
-      #   run: |
-      #     gem install modulesync
-      #     msync update --noop
-
-      # - name: Run msync update
-      #   if: ${{ github.repository_owner == 'TraGicCode' }}
-      #   run: |
-      #     gem install modulesync
-      #     msync update --pr --amend --force
-      # - name: Run msync update
-      #   if: ${{ github.repository_owner == 'TraGicCode' }}
-      #   shell: pwsh
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.MODULESYNC_GITHUB_TOKEN }}
-      #   run: |
-      #     git config --local user.email "${{ github.repository_owner }}@users.noreply.github.com"
-      #     git config --local user.name "TraGicCode"
-      #     git config --global user.email "${{ github.repository_owner }}@users.noreply.github.com"
-      #     git config --global user.name "TraGicCode"
-      #     gem install modulesync
-      #     msync update --noop
-      #     & ./scripts/commit-and-push-file-changes.ps1
-      #     msync update --pr --amend --force
-
-      - name: Setup SSH
+      - name: Setup SSH for modulesync
         uses: webfactory/ssh-agent@v0.5.3
         with:
             ssh-private-key: ${{ secrets.MODULESYNC_SHH_PRIVATE_KEY }}
-      - name: Run msync update
+
+      - name: Run ModuleSync update
         if: ${{ github.repository_owner == 'TraGicCode' }}
         shell: pwsh
         env:
