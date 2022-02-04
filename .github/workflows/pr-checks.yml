@@ -41,4 +41,5 @@ jobs:
         shell: pwsh
         run: |
           gem install modulesync
+          msync update --noop
           & ./scripts/commit-and-push-file-changes.ps1
