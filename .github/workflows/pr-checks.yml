@@ -16,7 +16,12 @@ jobs:
         with:
           ruby-version: 2.7
 
-      - name: Run msync
+      # - name: Run msync
+      #   run: |
+      #     gem install modulesync
+      #     msync update --noop
+
+      - name: Run msync update
+        if: ${{ github.repository_owner == 'TraGicCode' }}
         run: |
-          gem install modulesync
-          msync update --noop
+          msync update --pr --amend --force
