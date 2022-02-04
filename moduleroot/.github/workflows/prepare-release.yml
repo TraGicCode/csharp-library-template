@@ -1,0 +1,119 @@
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  get-version:
+    # Environment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }} # needed for 'codacy/git-version'
+          fetch-depth: 0 # needed for 'codacy/git-version'
+
+      # config.merge_prefix = "### UNCATEGORIZED PRS; LABEL THEM ON GITHUB"
+      # Cool changelog https://github.com/liqotech/liqo/blob/529c90a589869f5606507bf9390913fc62afc5d6/.github/workflows/integration.yml
+      - name: "Update Release CHANGELOG"
+        id: update-release-changelog
+        uses: heinrichreimer/github-changelog-generator-action@v2.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          excludeLabels: 'maintenance'
+          compareLink: true
+          pullRequests: true
+          author: true
+          prWoLabels: true
+          issues: false
+          verbose: true
+          prLabel: '### UNCATEGORIZED PRS; LABEL THEM ON GITHUB'
+          configureSections: '{
+              "breaking": {"labels": ["breaking-change"], "prefix": "### :boom: Breaking Change"},
+              "feature": {"labels": ["feature","kind/epic"], "prefix": "### :rocket: New Features"},
+              "bug": {"labels": ["bug"], "prefix": "### :bug: Bug Fixes"},
+              "cleanup": {"labels": ["cleanup", "maintenance"], "prefix": "### :broom: Code Refactoring"},
+              "docs": {"labels": ["docs"], "prefix": "### :memo: Documentation"}
+            }'
+
+      - name: Extract New Release Version
+        id: extract-release-version
+        uses: actions-ecosystem/action-regex-match@v2
+        with:
+          regex: '## \[(?<version>.+?)\]'
+          text: ${{ steps.update-release-changelog.outputs.changelog }}
+
+      - name: Echo New Release Version
+        run: echo "New Release Version is ${{ steps.extract-release-version.outputs.group1 }}"
+
+    outputs:
+      changelog: ${{ steps.update-release-changelog.outputs.changelog }}
+      version: ${{ steps.extract-release-version.outputs.group1 }}
+
+  build:
+    needs: [ get-version ]
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        dotnet-version: ['3.1.x', '5.0.x', '6.0.x']
+
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup .NET Core SDK  ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Restore Nuget Packages
+        run: dotnet restore
+
+      # Build
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Run MSBuild
+        run: msbuild /property:Configuration=Release /p:Version=${{ needs.get-version.outputs.version }}
+
+      # Generate changelog
+      - name: "Create CHANGELOG.md"
+        shell: pwsh
+        run: '"${{ needs.get-version.outputs.changelog }}" | Out-File -FilePath .\CHANGELOG.md'
+
+      # Commit changelog
+      - name: "Commit changes"
+        if: ${{ github.repository_owner == 'TraGicCode' }} # investigate this for security concerns and learning
+        run: |
+          git config --local user.email "${{ github.repository_owner }}@users.noreply.github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Release prep v${{ needs.get-version.outputs.version }}"
+
+      # Create pull request and push
+      # investigate if i want to use this
+      # Check 
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v3
+        if: ${{ github.repository_owner == 'TraGicCode' }}
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Release prep v${{ needs.get-version.outputs.version }}"
+          branch: "release-prep"
+          delete-branch: true
+          title: "Release prep v${{ needs.get-version.outputs.version }}"
+          body: |
+            Automated release-prep through from commit ${{ github.sha }}. 
+            Please verify before merging:
+            - [ ] [Changelog](https://github.com/${{ github.repository }}/blob/release-prep/CHANGELOG.md) is readable and has no unlabeled pull requests
+            - [ ] Ensure the [changelog](https://github.com/${{ github.repository }}/blob/release-prep/CHANGELOG.md) version and contents look correct.
+          labels: "maintenance"
+
+      - name: PR outputs
+        if: ${{ github.repository_owner == 'TraGicCode' }}
+        run: |
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
