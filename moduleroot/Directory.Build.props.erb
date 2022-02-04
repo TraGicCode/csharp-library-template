@@ -2,7 +2,7 @@
 # Create other Directory.Build.props in src/<module>/ folder
 require 'erb'
 
-module_sync_config_root = @metadata[:workdir] + "/../../../.."
+module_sync_config_root = @metadata[:workdir] + "/../../.."
 dynamic_file_templates_root = module_sync_config_root + "/filetemplates"
 
 rendered_template = ERB.new(File.read(dynamic_file_templates_root + "/Directory.Build.props.erb"), eoutvar: '_sub01').result(binding)
