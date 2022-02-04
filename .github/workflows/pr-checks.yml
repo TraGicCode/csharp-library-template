@@ -3,7 +3,7 @@ name: Pull Request Checks
 on: [pull_request]
 
 env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.MODULESYNC_GITHUB_TOKEN }}
 
 jobs:
   get-version:
@@ -42,11 +42,13 @@ jobs:
         if: ${{ github.repository_owner == 'TraGicCode' }}
         shell: pwsh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MODULESYNC_GITHUB_TOKEN }}
         run: |
+          git config --local user.email "${{ github.repository_owner }}@users.noreply.github.com"
+          git config --local user.name "TraGicCode"
+          git config --global user.email "${{ github.repository_owner }}@users.noreply.github.com"
+          git config --global user.name "TraGicCode"
           gem install modulesync
           msync update --noop
           & ./scripts/commit-and-push-file-changes.ps1
-          sha="$(git rev-parse --short HEAD)"
-          msync_args="--filter=${{ github.event.inputs.filter }}"
-          bundle exec msync update --pr --pr-title "[ModuleSync] Update from ${{ github.repository }}@${sha}" --remote-branch "modulesync-${sha}" ${msync_args}
+          msync update --pr --amend --force
