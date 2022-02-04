@@ -41,6 +41,8 @@ jobs:
       - name: Run msync update
         if: ${{ github.repository_owner == 'TraGicCode' }}
         shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --local user.email "${{ github.repository_owner }}@users.noreply.github.com"
           git config --local user.name "TraGicCode"
@@ -49,4 +51,4 @@ jobs:
           gem install modulesync
           msync update --noop
           & ./scripts/commit-and-push-file-changes.ps1
-          msync update --pr --amend --git_base "https://${{ secrets.GITHUB_TOKEN }}@github.com/" --force 
+          msync update --pr --amend --force 
