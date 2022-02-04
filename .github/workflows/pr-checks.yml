@@ -1,0 +1,22 @@
+name: Pull Request Checks
+
+on: [pull_request]
+
+jobs:
+  get-version:
+    # Environment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Ruby 2.7
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+
+      - name: Run msync
+        run: |
+          gem install modulesync
+          msync update --noop
