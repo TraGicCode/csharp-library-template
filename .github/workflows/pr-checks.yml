@@ -31,8 +31,14 @@ jobs:
       #     gem install modulesync
       #     msync update --noop
 
+      # - name: Run msync update
+      #   if: ${{ github.repository_owner == 'TraGicCode' }}
+      #   run: |
+      #     gem install modulesync
+      #     msync update --pr --amend --force
       - name: Run msync update
         if: ${{ github.repository_owner == 'TraGicCode' }}
+        shell: pwsh
         run: |
           gem install modulesync
-          msync update --pr --force
+          & ./scripts/commit-and-push-file-changes.ps1
