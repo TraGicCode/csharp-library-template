@@ -64,7 +64,5 @@ jobs:
           & ./scripts/commit-and-push-file-changes.ps1
       
       - name: gogo
-        env:
-          GITHUB_TOKEN: ${{ secrets.MODULESYNC_GITHUB_TOKEN }}
         run: |
           msync update --pr --amend --force
