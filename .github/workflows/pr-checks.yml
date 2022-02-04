@@ -2,6 +2,9 @@ name: Pull Request Checks
 
 on: [pull_request]
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   get-version:
     # Environment
