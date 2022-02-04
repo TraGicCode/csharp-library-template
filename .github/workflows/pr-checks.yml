@@ -65,6 +65,6 @@ jobs:
       
       - name: gogo
         env:
-        GITHUB_TOKEN: ${{ secrets.MODULESYNC_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MODULESYNC_GITHUB_TOKEN }}
         run: |
           msync update --pr --amend --force
