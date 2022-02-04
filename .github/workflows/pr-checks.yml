@@ -53,6 +53,10 @@ jobs:
       #     & ./scripts/commit-and-push-file-changes.ps1
       #     msync update --pr --amend --force
 
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+            ssh-private-key: ${{ secrets.MODULESYNC_SHH_PRIVATE_KEY }}
       - name: Run msync update
         if: ${{ github.repository_owner == 'TraGicCode' }}
         shell: pwsh
@@ -62,7 +66,6 @@ jobs:
           gem install modulesync
           msync update --noop
           & ./scripts/commit-and-push-file-changes.ps1
-      
-      - name: gogo
-        run: |
           msync update --pr --amend --force
+
+      
