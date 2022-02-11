@@ -3,7 +3,7 @@ name: Run ModuleSync
 on: [pull_request]
 
 jobs:
-  get-version:
+  run-module-sync:
     # Environment
     runs-on: ubuntu-latest
 
