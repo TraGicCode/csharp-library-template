@@ -1,0 +1,63 @@
+name: Create Nuget Package and Publish
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Build, Pack & Publish
+    runs-on: windows-latest
+    strategy:
+    matrix:
+      dotnet-version: ['6.0.x']
+
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v2
+
+      - name: Read CHANGELOG.md
+        id: changelog
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./CHANGELOG.md
+      - name: Echo package.json
+        run: echo "${{ steps.package.outputs.content }}"
+
+      - name: Extract New Release Version
+        id: extract-release-version
+        uses: actions-ecosystem/action-regex-match@v2
+        with:
+          regex: '## \[(?<version>.+?)\]'
+          text: ${{ steps.package.outputs.content }}
+
+      - name: Echo New Release Version
+        run: echo "New Release Version is ${{ steps.extract-release-version.outputs.group1 }}"
+
+      - name: Setup .NET Core SDK  ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Restore Nuget Packages
+        run: dotnet restore
+
+      # Build
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Run MSBuild
+        run: msbuild /property:Configuration=Release /p:Version=${{ steps.extract-release-version.outputs.group1 }}
+
+      - name: Publish NuGet package to NuGet Gallery
+        run: |
+          dotnet nuget push ./src/<%= @metadata[:module_name] %>./bin/Release/<%= @metadata[:module_name] %>.*nupkg --api-key ${secrets.NUGET_API_KEY} --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: Create release
+        uses: actions/create-release@v1
+        id: create_release
+        with:
+          tag_name: ${{ steps.extract-release-version.outputs.group1 }}
+          prerelease: false
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
