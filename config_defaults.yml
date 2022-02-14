@@ -7,9 +7,6 @@
     NServiceBus.CustomChecks.Http:
       library_type: nservicebus-custom-check
 
-appveyor.yml:
-  image: 'Visual Studio 2019'
-
 Directory.Build.props:
   nservicebus-custom-check:
     nuget-package-tags:
